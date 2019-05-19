@@ -3,11 +3,17 @@ var express = require('express');
 var pug = require('pug');
 var eloRating = require('elo-rating');
 var app = express();
-var player = new object (){
-
+function Player(playertag, playername, elo, wins, losses){
+	this.playertag = playertag;
+	this.playername = playername;
+	this.elo = elo;
+	this.wins = wins;
+	this.losses = losses;
+	//add match and game wins and losses
 };
 
-var playerArray[]
+var playerArray = [];
+
 
 var url = 'mongodb://localhost';
 
@@ -37,7 +43,9 @@ app.get('/', function(req, res)	{
 		cursor.forEach(function(doc)	{
 			if(doc != null) {
 				console.log(doc);
-			
+				var tempPerson = new Person(doc.playerTag, doc.playerName, )
+				//playerArray.push(doc.playerTag);				
+				//eloArray.push(doc.playerElo);
 			}
 		}
 	);
@@ -46,7 +54,7 @@ app.get('/', function(req, res)	{
 	});
 	
 	res.render('akiElo', {
-		title: 'akiElo', firstPlayer: playerArray[0], firstElo: eloArray[0], secondPlayer: playerArray[1], secondElo: eloArray[1], thirdPlayer: playerArray[2], thirdElo: eloArray[2] 
+		title: 'Akihabara Third Strike Leaderbaord', firstPlayer: playerArray[0], firstElo: eloArray[0], secondPlayer: playerArray[1], secondElo: eloArray[1], thirdPlayer: playerArray[2], thirdElo: eloArray[2] 
 	})
 	//console.log(eloRating.calculate(eloArray[0], eloArray[2]));
 });
