@@ -12,16 +12,36 @@ function Player(playertag, playername, elo, wins, losses){
 	//add match and game wins and losses
 };
 
-var playerArray = [];
+var playerArray = new Array();
 
 
 var url = 'mongodb://localhost';
 
 app.set('view engine', 'pug');
 
-var compiledTemplate = pug.compileFile('akiElo.pug');
+//var compiledTemplate = pug.compileFile('akiElo.pug');  //call 1 for same thing
 
+MongoClient.connect(url, function(err, client)	{
+		if (err) throw err;
+		var db = client.db('SF3db');
+		console.log("connected.");
+	
+	
+		var cursor = db.collection('playerbase').find();
 
+		cursor.forEach(function(doc)	{
+			if(doc != null) {
+				//console.log(doc);
+				var tempPerson = new Player(doc.playerTag, doc.playerName, doc.playerElo, doc.playerWins, doc.playerLosses);
+				//console.log(doc.playerTag);
+				playerArray.push(tempPerson);
+				console.log(tempPerson);
+			}
+		}
+	);
+
+	client.close();
+});
 
 app.route('/matchhistory').get(function(req, res)	{
 
@@ -32,34 +52,31 @@ app.route('/report').get(function(req, res)	{
 });
 
 app.get('/', function(req, res)	{
-	MongoClient.connect(url, function(err, client)	{
-		if (err) throw err;
-		var db = client.db('SF3db');
-		console.log("connected.");
-	
-	
-		var cursor = db.collection('playerbase').find();
 
-		cursor.forEach(function(doc)	{
-			if(doc != null) {
-				console.log(doc);
-				var tempPerson = new Player(doc.playerTag, doc.playerName, doc.playerElo, doc.playerWins, doc.playerLosses);
-				playerArray.push(tempPerson);
-				//playerArray.push(doc.playerTag);				
-				//eloArray.push(doc.playerElo);
-			}
-		}
-	);
+	console.log(playerArray);
 
-	client.close();
+	//qhetto slang
+	var tags = [];
+	var names = [];
+	var elos = [];
+	var wins = [];
+	var losses = [];
+
+	playerArray.forEach(function(element) {
+		tags.push(element.playertag);
+		console.log("tags pushed: " + element.playertag);
+		names.push(element.playername);
+		elos.push(element.elo);
+		wins.push(element.wins);
+		wins.push(element.losses);
 	});
 
 	// Here we gotta calculate the leaderboard, then post the entire leaderboard
-	
+	//console.log(playerArray[0].playertag);
 	res.render('akiElo', {
-		firstPlayerTag: playerArray[0].playertag, firstPlayerName: playerArray[0].playername, firstPlayerElo: playerArray[0].elo, firstPlayerWins: playerArray[0].wins, firstPlayerLosses: playerArray[0].losses, 
-		secondPlayerTag: playerArray.playertag[1], secondPlayerName: playerArray.playername[1], secondPlayerElo: playerArray.elo[1], secondPlayerWins: playerArray.wins[1], secondPlayerLosses: playerArray.losses[1],
-		thirdPlayerTag: playerArray.playertag[2], thirdPlayerName: playerArray.playername[2], thirdPlayerElo: playerArray.elo[2], thirdPlayerWins: playerArray.wins[2], thirdPlayerLosses: playerArray.losses[2] 
+		firstPlayerTag: tags[0], firstPlayerName: names[0], firstPlayerElo: elos[0], firstPlayerWins: wins[0], firstPlayerLosses: losses[0], 
+		secondPlayerTag: tags[1], secondPlayerName: names[1], secondPlayerElo: elos[1], secondPlayerWins: wins[1], secondPlayerLosses: losses[1],
+		thirdPlayerTag: tags[2], thirdPlayerName: names[2], thirdPlayerElo: elos[2], thirdPlayerWins: wins[2], thirdPlayerLosses: losses[2] 
 	})
 	//console.log(eloRating.calculate(eloArray[0], eloArray[2]));
 });
