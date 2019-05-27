@@ -43,7 +43,7 @@ app.get('/', function(req, res)	{
 		cursor.forEach(function(doc)	{
 			if(doc != null) {
 				console.log(doc);
-				var tempPerson = new Person(doc.playerTag, doc.playerName, doc.playerElo, doc.playerWins, doc.playerLosses);
+				var tempPerson = new Player(doc.playerTag, doc.playerName, doc.playerElo, doc.playerWins, doc.playerLosses);
 				playerArray.push(tempPerson);
 				//playerArray.push(doc.playerTag);				
 				//eloArray.push(doc.playerElo);
@@ -57,7 +57,7 @@ app.get('/', function(req, res)	{
 	// Here we gotta calculate the leaderboard, then post the entire leaderboard
 	
 	res.render('akiElo', {
-		title: 'Akihabara Third Strike Leaderbaord', firstPlayerTag: playerArray.playertag[0], firstPlayerName: playerArray.playername[0], firstPlayerElo: playerArray.elo[0], firstPlayerWins: playerArray.wins[0], firstPlayerLosses: playerArray.losses[0], 
+		firstPlayerTag: playerArray[0].playertag, firstPlayerName: playerArray[0].playername, firstPlayerElo: playerArray[0].elo, firstPlayerWins: playerArray[0].wins, firstPlayerLosses: playerArray[0].losses, 
 		secondPlayerTag: playerArray.playertag[1], secondPlayerName: playerArray.playername[1], secondPlayerElo: playerArray.elo[1], secondPlayerWins: playerArray.wins[1], secondPlayerLosses: playerArray.losses[1],
 		thirdPlayerTag: playerArray.playertag[2], thirdPlayerName: playerArray.playername[2], thirdPlayerElo: playerArray.elo[2], thirdPlayerWins: playerArray.wins[2], thirdPlayerLosses: playerArray.losses[2] 
 	})
