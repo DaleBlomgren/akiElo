@@ -1,5 +1,14 @@
 html
  head
+   li Winning Player
+   select
+     each player in playerlist
+       option=player
+   li Character Used
+   select 
+     each character in ['Akuma', 'Ken', 'Chun li', 'Dudly', 'Yun', 'Yang', 'Sean', 'Oro', 'Makoto', 'Q', 'Necro', 'Ryu', 'Twelve', 'Hugo', 'Ibuki', 'Remy', 'Urien']
+       option=character
+   li Honorable Opponent
    select
      each player in playerlist
        option=player
