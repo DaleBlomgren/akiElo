@@ -13,6 +13,9 @@ function Player(playertag, playername, elo, wins, losses){
 };
 
 var playerArray = new Array();
+var listOfPlayers = new Array();
+
+
 
 
 var url = 'mongodb://localhost';
@@ -35,7 +38,7 @@ MongoClient.connect(url, function(err, client)	{
 				var tempPerson = new Player(doc.playerTag, doc.playerName, doc.playerElo, doc.playerWins, doc.playerLosses);
 				//console.log(doc.playerTag);
 				playerArray.push(tempPerson);
-				console.log(tempPerson);
+				//console.log(tempPerson);
 			}
 		}
 	);
@@ -43,12 +46,25 @@ MongoClient.connect(url, function(err, client)	{
 	client.close();
 });
 
+
+
+//console.log(listOfPlayers);
+
+listOfPlayers.forEach(function(){
+	console.log("BIGS " + this);
+});
+
 app.route('/matchhistory').get(function(req, res)	{
 
 });
 
 app.route('/report').get(function(req, res)	{
+	playerArray.forEach(function(element){
+		listOfPlayers.push(element.playertag);
+	});
 
+	console.log(listOfPlayers);
+	res.render('akiReport', {playerlist: listOfPlayers})
 });
 
 app.get('/', function(req, res)	{
