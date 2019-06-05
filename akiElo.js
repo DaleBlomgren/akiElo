@@ -55,7 +55,7 @@ app.route('/report').get(function(req, res)	{
 	});
 
 	console.log(listOfPlayers);
-	res.render('akiReport', {playerlist: listOfPlayers, matchDBUpdate(winner, loser)})
+	res.render('akiReport', {playerlist: listOfPlayers, matchDBUpdate(winner, loser)})  // double check this shit out
 });
 
 app.get('/', function(req, res)	{
@@ -107,6 +107,29 @@ function matchDBUpdate(winner, loser){
 		console.log('locLoser: ' + locLoser);
 
 		var result = EloRating.calculate(locWinner.playerElo, locLoser.playerElo);
+
+		db.collection('playerbase').update(
+			{ playerTag: winner},
+				{ $set:
+					{
+						playerElo: result.playerRating,
+						playerWins: ++locWinner.playerWins
+					}
+				}
+		)
+
+		db.collection('playerbase').update(
+			{ playerTag: loser},
+				{ $set: 
+					{
+						playerElo: result.opponentRating,
+						playerLosses: ++locLoser.playerLosses
+					}
+				} 
+			)
+		console.log("Updated.");
+
+		client.close();
 
 	});
 
