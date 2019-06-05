@@ -22,8 +22,6 @@ var url = 'mongodb://localhost';
 
 app.set('view engine', 'pug');
 
-//var compiledTemplate = pug.compileFile('akiElo.pug');  //call 1 for same thing
-
 MongoClient.connect(url, function(err, client)	{
 		if (err) throw err;
 		var db = client.db('SF3db');
@@ -47,13 +45,6 @@ MongoClient.connect(url, function(err, client)	{
 });
 
 
-
-//console.log(listOfPlayers);
-
-listOfPlayers.forEach(function(){
-	console.log("BIGS " + this);
-});
-
 app.route('/matchhistory').get(function(req, res)	{
 
 });
@@ -64,7 +55,7 @@ app.route('/report').get(function(req, res)	{
 	});
 
 	console.log(listOfPlayers);
-	res.render('akiReport', {playerlist: listOfPlayers})
+	res.render('akiReport', {playerlist: listOfPlayers, matchDBUpdate(winner, loser)})
 });
 
 app.get('/', function(req, res)	{
@@ -100,3 +91,23 @@ app.get('/', function(req, res)	{
 
 
 var server = app.listen(6969, function() {});
+
+function matchDBUpdate(winner, loser){
+	MongoClient.connect(url, function(err, client)	{
+		if (err) throw err;
+		var db = client.db('SF3db');
+		if (db) console.log('Connected.');
+
+		var cursor = db.collection('playerbase').find(winner);
+		var locWinner = cursor;
+		console.log('locWinner: ' + locWinner);
+
+		cursor = db.collection('playerbase').find(loser);
+		var locLoser = cursor;
+		console.log('locLoser: ' + locLoser);
+
+		var result = EloRating.calculate(locWinner.playerElo, locLoser.playerElo);
+
+	});
+
+}

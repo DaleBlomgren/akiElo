@@ -1,15 +1,24 @@
+- var winningPlayer = "";
+- var winningCharacter = "";
+- var losingPlayer = "";
+- var losingCharacter = "";
 html
  head
-   li Winning Player
+   p Winning Player
    select
      each player in playerlist
        option=player
-   li Character Used
+   p Character Used
    select 
      each character in ['Akuma', 'Ken', 'Chun li', 'Dudly', 'Yun', 'Yang', 'Sean', 'Oro', 'Makoto', 'Q', 'Necro', 'Ryu', 'Twelve', 'Hugo', 'Ibuki', 'Remy', 'Urien']
        option=character
-   li Honorable Opponent
+   p Honorable Opponent
    select
      each player in playerlist
        option=player
+   p Character Used
+   select 
+     each character in ['Akuma', 'Ken', 'Chun li', 'Dudly', 'Yun', 'Yang', 'Sean', 'Oro', 'Makoto', 'Q', 'Necro', 'Ryu', 'Twelve', 'Hugo', 'Ibuki', 'Remy', 'Urien']
+       option=character
+   button(type='button' class='btn btn-info btn-lg' value="Submit" onclick)
  body
