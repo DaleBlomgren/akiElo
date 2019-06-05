@@ -55,7 +55,8 @@ app.route('/report').get(function(req, res)	{
 	});
 
 	console.log(listOfPlayers);
-	res.render('akiReport', {playerlist: listOfPlayers, matchDBUpdate(winner, loser)})  // double check this shit out
+	res.render('akiReport', {playerlist: listOfPlayers//, matchDBUpdate(winner, loser)
+	})  
 });
 
 app.get('/', function(req, res)	{
@@ -92,8 +93,11 @@ app.get('/', function(req, res)	{
 
 var server = app.listen(6969, function() {});
 
-function matchDBUpdate(winner, loser){
-	MongoClient.connect(url, function(err, client)	{
+function matchDBUpdate(){
+
+	console.log(document.getElementsByTagName('winningPlayerTag'));
+
+/*	MongoClient.connect(url, function(err, client)	{
 		if (err) throw err;
 		var db = client.db('SF3db');
 		if (db) console.log('Connected.');
@@ -132,5 +136,5 @@ function matchDBUpdate(winner, loser){
 		client.close();
 
 	});
-
+*/
 }

@@ -5,20 +5,21 @@
 html
  head
    p Winning Player
-   select
+   select#winningPlayerTag(name='winningPlayerTag')
      each player in playerlist
        option=player
    p Character Used
-   select 
+   select#winningPlayerCharacter(name='winningPlayerCharacter') 
      each character in ['Akuma', 'Ken', 'Chun li', 'Dudly', 'Yun', 'Yang', 'Sean', 'Oro', 'Makoto', 'Q', 'Necro', 'Ryu', 'Twelve', 'Hugo', 'Ibuki', 'Remy', 'Urien']
        option=character
    p Honorable Opponent
-   select
+   select#losingPlayerTag(name='losingPlayerTag')
      each player in playerlist
        option=player
    p Character Used
-   select 
+   select#losingPlayerCharacter(name='losingPlayerCharacter') 
      each character in ['Akuma', 'Ken', 'Chun li', 'Dudly', 'Yun', 'Yang', 'Sean', 'Oro', 'Makoto', 'Q', 'Necro', 'Ryu', 'Twelve', 'Hugo', 'Ibuki', 'Remy', 'Urien']
        option=character
-   button(type='button' class='btn btn-info btn-lg' value="Submit" onclick)
+   a(href="create"): button(type="button" onclick='matchDBUpdate()') Submit
+   
  body
