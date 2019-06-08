@@ -21,6 +21,7 @@ var listOfPlayers = new Array();
 var url = 'mongodb://localhost';
 
 app.set('view engine', 'pug');
+app.use('/scripts', express.static(__dirname + '/scripts'));
 
 MongoClient.connect(url, function(err, client)	{
 		if (err) throw err;
