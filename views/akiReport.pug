@@ -2,12 +2,13 @@
 - var winningCharacter = "";
 - var losingPlayer = "";
 - var losingCharacter = "";
+
 html
  head
    p Winning Player
    select#winningPlayerTag(name='winningPlayerTag')
      each player in playerlist
-       option=player
+       option=player 
    p Character Used
    select#winningPlayerCharacter(name='winningPlayerCharacter') 
      each character in ['Akuma', 'Ken', 'Chun li', 'Dudly', 'Yun', 'Yang', 'Sean', 'Oro', 'Makoto', 'Q', 'Necro', 'Ryu', 'Twelve', 'Hugo', 'Ibuki', 'Remy', 'Urien']
@@ -20,6 +21,6 @@ html
    select#losingPlayerCharacter(name='losingPlayerCharacter') 
      each character in ['Akuma', 'Ken', 'Chun li', 'Dudly', 'Yun', 'Yang', 'Sean', 'Oro', 'Makoto', 'Q', 'Necro', 'Ryu', 'Twelve', 'Hugo', 'Ibuki', 'Remy', 'Urien']
        option=character
-   a(href="create"): button(type="button" onclick='matchDBUpdate()') Submit
-   
+   script(src='./akiReport.js') //This should be changed asdf
+   button(type="button", onclick="printNames()") Submit match
  body

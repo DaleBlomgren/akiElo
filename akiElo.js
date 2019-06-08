@@ -54,9 +54,8 @@ app.route('/report').get(function(req, res)	{
 		listOfPlayers.push(element.playertag);
 	});
 
-	console.log(listOfPlayers);
-	res.render('akiReport', {playerlist: listOfPlayers//, matchDBUpdate(winner, loser)
-	})  
+	//console.log(listOfPlayers);
+	res.render('akiReport', {playerlist: listOfPlayers})  
 });
 
 app.get('/', function(req, res)	{
@@ -93,9 +92,10 @@ app.get('/', function(req, res)	{
 
 var server = app.listen(6969, function() {});
 
-function matchDBUpdate(){
+//function matchDBUpdate(){
 
-	console.log(document.getElementsByTagName('winningPlayerTag'));
+//	console.log(document.getElementsByTagName('winningPlayerTag'));
+//	alert(updated);
 
 /*	MongoClient.connect(url, function(err, client)	{
 		if (err) throw err;
@@ -137,4 +137,4 @@ function matchDBUpdate(){
 
 	});
 */
-}
+//}
