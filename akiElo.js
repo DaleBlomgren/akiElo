@@ -67,8 +67,9 @@ app.route('/report').get(function(req, res)	{
 });
 
 app.get('/', function(req, res)	{
+	console.log(req.body);
 
-	console.log(playerArray);
+	//console.log(playerArray);
 
 	//qhetto slang
 	var tags = [];
@@ -96,10 +97,20 @@ app.get('/', function(req, res)	{
 	
 });
 
-app.post('/3Slistener', function(req, res) {
+app.post('/playerID', function(req, res) {
+	var reportObj = JSON.parse(req.body);
+	res.json(req.body);
+	console.log(reportObj);
+	//res.send(200);
+});
+
+app.route('/playerID/:id').get(function(req, res) {
 	console.log(req.body);
+	res.render('playerID', {output:req.params.id})
 
 });
+
+
 
 //when the app gets a json object of report schema, then we update the database with the updated player stats
 
