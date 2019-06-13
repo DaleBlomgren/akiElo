@@ -98,9 +98,10 @@ app.get('/', function(req, res)	{
 });
 
 app.post('/playerID', function(req, res) {
-	var reportObj = JSON.parse(req.body);
+	//var reportObj = JSON.parse(req.body);
 	res.json(req.body);
-	console.log(reportObj);
+	console.log(req.body);
+	console.log(req.body.winningTag + " is the winner!");
 	//res.send(200);
 });
 
