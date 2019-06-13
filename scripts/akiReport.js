@@ -17,7 +17,7 @@ function testDaJSON(){
 	var xCharacter = document.getElementById('winningPlayerCharacter');
 	var y = document.getElementById('losingPlayerTag');
 	var yCharacter = document.getElementById('losingPlayerCharacter');
-	var package = {winningTag: x, winningCharacter: xCharacter, losingTag: y, losingCharacter: yCharacter};
+	var package = {winningTag: x.value, winningCharacter: xCharacter.value, losingTag: y.value, losingCharacter: yCharacter.value};
 	console.log(package);
 	var cPackage = JSON.stringify(package);
 	console.log("\n\ncPackage: " + cPackage);
