@@ -3,6 +3,10 @@ var express = require('express');
 var pug = require('pug');
 var eloRating = require('elo-rating');
 var app = express();
+var mongoose = require('mongoose');
+
+//var Report = require('../schemas');
+
 function Player(playertag, playername, elo, wins, losses){
 	this.playertag = playertag;
 	this.playername = playername;
@@ -16,11 +20,14 @@ var playerArray = new Array();
 var listOfPlayers = new Array();
 
 
-
-
 var url = 'mongodb://localhost';
 
+mongoose.connect(url, {
+	useMongoClient: true
+});
+
 app.set('view engine', 'pug');
+app.use(express.json());
 app.use('/scripts', express.static(__dirname + '/scripts'));
 
 MongoClient.connect(url, function(err, client)	{
@@ -80,16 +87,21 @@ app.get('/', function(req, res)	{
 	});
 
 	// Here we gotta calculate the leaderboard, then post the entire leaderboard
-	//console.log(playerArray[0].playertag);
+	
 	res.render('akiElo', {
 		firstPlayerTag: tags[0], firstPlayerName: names[0], firstPlayerElo: elos[0], firstPlayerWins: wins[0], firstPlayerLosses: losses[0], 
 		secondPlayerTag: tags[1], secondPlayerName: names[1], secondPlayerElo: elos[1], secondPlayerWins: wins[1], secondPlayerLosses: losses[1],
 		thirdPlayerTag: tags[2], thirdPlayerName: names[2], thirdPlayerElo: elos[2], thirdPlayerWins: wins[2], thirdPlayerLosses: losses[2] 
 	})
-	//console.log(eloRating.calculate(eloArray[0], eloArray[2]));
+	
 });
 
+app.post('/3Slistener', function(req, res) {
+	console.log(req.body);
 
+});
+
+//when the app gets a json object of report schema, then we update the database with the updated player stats
 
 var server = app.listen(6969, function() {});
 
