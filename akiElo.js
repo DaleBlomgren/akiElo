@@ -30,28 +30,32 @@ app.set('view engine', 'pug');
 app.use(express.json());
 app.use('/scripts', express.static(__dirname + '/scripts'));
 
-MongoClient.connect(url, function(err, client)	{
-		if (err) throw err;
-		var db = client.db('SF3db');
-		console.log("connected.");
+function updateLeaderboard(){
+	playerArray = new Array();
+	MongoClient.connect(url, function(err, client)	{
+			if (err) throw err;
+			var db = client.db('SF3db');
+			//console.log("connected.");
 	
 	
-		var cursor = db.collection('playerbase').find();
+			var cursor = db.collection('playerbase').find();
 
-		cursor.forEach(function(doc)	{
-			if(doc != null) {
+			cursor.forEach(function(doc)	{
+				if(doc != null) {
 				//console.log(doc);
 				var tempPerson = new Player(doc.playerTag, doc.playerName, doc.playerElo, doc.playerWins, doc.playerLosses);
 				//console.log(doc.playerTag);
 				playerArray.push(tempPerson);
 				//console.log(tempPerson);
+				}
 			}
-		}
-	);
+		);
 
-	client.close();
-});
-
+		client.close();
+	});
+}
+updateLeaderboard();
+setInterval(function(){ updateLeaderboard() }, 10000);
 
 app.route('/matchhistory').get(function(req, res)	{
 
@@ -97,48 +101,74 @@ app.get('/', function(req, res)	{
 	
 });
 
-app.post('/playerID', function(req, res) {
+app.post('/playerID', async function(req, res) {
 	//var reportObj = JSON.parse(req.body);
 	res.json(req.body);
-	console.log(req.body);
+	var matchJs = req.body;
+	
 	console.log(req.body.winningTag + " is the winner!");
-	//res.send(200);
-});
-
-app.route('/playerID/:id').get(function(req, res) {
-	console.log(req.body);
-	res.render('playerID', {output:req.params.id})
-
-});
+	
 
 
+		//console.log("matchJs.winningTag: " + matchJs.winningTag);
+		//var wursor = db.collection('playerbase').find({"playerTag": matchJs.winningTag}); 
+		//var locWinner = db.collection('playerbase').findOne({ "playerTag": matchJs.winningTag}, function(err, winner){});
+	    playerTagSearch(matchJs.winningTag, matchJs.losingTag).then(result => {
+		console.log("finished promise result: " + result);
+		var calculatedElo = eloRating.calculate(result.winningDocument.playerElo, result.losingDocument.playerElo);
 
-//when the app gets a json object of report schema, then we update the database with the updated player stats
+		MongoClient.connect(url, function(err, client)	{
+			if (err) throw err;
+			var db = client.db('SF3db');
+			if (db) console.log('Connected.');
 
-var server = app.listen(6969, function() {});
+			db.collection('playerbase').update(
+				{ playerTag: matchJs.winningTag},
+				{ $set:
+					{
+						playerElo: calculatedElo.playerRating,
+						playerWins: ++result.winningDocument.playerWins
+					}
+				}
+			)
 
-//function matchDBUpdate(){
+			db.collection('playerbase').update(
+				{ playerTag: matchJs.losingTag},
+				{ $set: 
+					{
+						playerElo: calculatedElo.opponentRating,
+						playerLosses: ++result.losingDocument.playerLosses
+					}
+				} 
+			)
+			client.close();
+		});
+		/*
+		//	console.log("winner.playerTag: " + winner.playerTag);
+		//	wursor = winner;
+		//});
+		//var locWinner = wursor;
+		var tempDocument = wursor.next();
 
-//	console.log(document.getElementsByTagName('winningPlayerTag'));
-//	alert(updated);
-
-/*	MongoClient.connect(url, function(err, client)	{
-		if (err) throw err;
-		var db = client.db('SF3db');
-		if (db) console.log('Connected.');
-
-		var cursor = db.collection('playerbase').find(winner);
-		var locWinner = cursor;
+		tempDocument.then(console.log("tempDocument:" + tempDocument));
+		console.log('wursor: ' + wursor);
 		console.log('locWinner: ' + locWinner);
 
-		cursor = db.collection('playerbase').find(loser);
-		var locLoser = cursor;
-		console.log('locLoser: ' + locLoser);
+		console.log("matchJs.losingTag: " + matchJs.losingTag);
+		//var lursor; 
+		var locLoser = db.collection('playerbase').findOne({"playerTag": matchJs.losingTag}, function(err, loser){});
+		//	if (err) throw err;
+		//	console.log("loser.playerTag: " + loser.playerTag);
+		//	lursor = loser;
 
-		var result = EloRating.calculate(locWinner.playerElo, locLoser.playerElo);
+		//});
+		//var locLoser = lursor;
+		console.log('locLoser: ' + locLoser.playerTag);
+
+		//var result = eloRating.calculate(locWinner.playerElo, locLoser.playerElo);
 
 		db.collection('playerbase').update(
-			{ playerTag: winner},
+			{ playerTag: matchJs.winningTag},
 				{ $set:
 					{
 						playerElo: result.playerRating,
@@ -148,7 +178,7 @@ var server = app.listen(6969, function() {});
 		)
 
 		db.collection('playerbase').update(
-			{ playerTag: loser},
+			{ playerTag: matchJs.losingTag},
 				{ $set: 
 					{
 						playerElo: result.opponentRating,
@@ -156,10 +186,55 @@ var server = app.listen(6969, function() {});
 					}
 				} 
 			)
+		*/
 		console.log("Updated.");
 
-		client.close();
+		//client.close();
 
 	});
-*/
-//}
+
+
+	//res.send(200);
+});
+
+app.route('/playerID/:id').get(function(req, res) {
+	console.log(req.body);
+	res.render('playerID', {output:req.params.id})
+
+});
+
+async function playerTagSearch(winningPlayerTag, losingPlayerTag){
+	MongoClient.connect(url, async function(err, client)	{
+		if (err) throw err;
+		var db = client.db('SF3db');
+		if (db) console.log('Connected.');
+
+		console.log("in playerSearch()");
+		let wursor = await db.collection('playerbase').find({"playerTag": winningPlayerTag});
+		let lursor = await db.collection('playerbase').find({"playerTag": losingPlayerTag});
+
+		
+
+		wursor.forEach(function(doc){
+			var tempWinner = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
+		}).then(function(){
+		lursor.forEach(function(doc){
+			var tempLoser = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
+		})}).then(function(){
+		var packet = {winningDocument: tempWinner, losingDocument: tempLoser};
+		console.log(packet);
+		client.close();
+		return packet;
+		});
+
+	});//.then(packet => {
+	//	console.log("packet: " + packet);
+		//var packet = {winningDocument: wursor, losingDocument: losingPlayerTag};
+		//return packet; 
+	//});
+
+	
+};
+
+var server = app.listen(6969, function() {});
+
