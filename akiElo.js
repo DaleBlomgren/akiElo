@@ -4,17 +4,6 @@ var pug = require('pug');
 var eloRating = require('elo-rating');
 var app = express();
 
-function p1(matchJs) {
-	var promise = new Promise(function(resolve, reject) {
-	//	setTimeout(function(){
-			console.log("Inside p1 pre playerTagSearch()");
-			var stuff = playerTagSearch(matchJs.WinningTag, matchJs.losingTag);
-			resolve(stuff);
-	//	});
-	});
-	return promise;
-}
-
 function Player(playertag, playername, elo, wins, losses){
 	this.playertag = playertag;
 	this.playername = playername;
@@ -54,13 +43,28 @@ function updateLeaderboard(){
 	});
 }
 updateLeaderboard();
-setInterval(function(){ updateLeaderboard() }, 10000);
+setInterval(function(){ updateLeaderboard() }, 5000);
+
+//Sort playerArray
+
+function compare(a, b) {
+	
+	if (a.elo < b.elo){
+		return 1;
+	} else if (a.elo > b.elo){
+		return -1;
+	}
+	return 0;
+}
+
+//playerArray.sort(compare);
 
 app.route('/matchhistory').get(function(req, res)	{
 
 });
 
 app.route('/report').get(function(req, res)	{
+	listOfPlayers = new Array();
 	playerArray.forEach(function(element){
 		listOfPlayers.push(element.playertag);
 	});
@@ -70,9 +74,14 @@ app.route('/report').get(function(req, res)	{
 });
 
 app.get('/', function(req, res)	{
-	console.log(req.body);
+	//var sortable = [];
+	//for (var  in playerArray){
+	//	sortable.push([])
+	//}
+	//console.log(playerArray);
+	playerArray.sort(compare);
 
-	//qhetto slang
+	
 	var tags = [];
 	var names = [];
 	var elos = [];
@@ -104,14 +113,9 @@ app.post('/playerID', async function(req, res) {
 	console.log(req.body.winningTag + " is the winner!");
 	console.log("matchJs: " + Object.values(matchJs));
 
-	/*	p1(matchJs).then(function(packet) {
-			console.log("packet: " + packet);
-			calculatedElo = eloRating.calculate(packet.winningDocument.playerElo, packet.losingDocument.playerElo);
-		});
-	 */
 
-	 playerTagSearch(matchJs.winningTag, matchJs.losingTag).then(function(packet){
-	 	setTimeout(() => {
+	playerTagSearch(matchJs.winningTag, matchJs.losingTag).then(function(packet){
+		setTimeout(() => {
 	 	console.log("packet: " + Object.values(packet));
 	 	calculatedElo = eloRating.calculate(packet.winningDocument.playerElo, packet.losingDocument.playerElo);
 	 
