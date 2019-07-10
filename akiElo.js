@@ -70,17 +70,11 @@ app.route('/report').get(function(req, res)	{
 	});
 
 	//console.log(listOfPlayers);
-	res.render('akiReport', {playerlist: listOfPlayers})  
+	res.render('akiReport', { playerlist: listOfPlayers})  
 });
 
 app.get('/', function(req, res)	{
-	//var sortable = [];
-	//for (var  in playerArray){
-	//	sortable.push([])
-	//}
-	//console.log(playerArray);
 	playerArray.sort(compare);
-
 	
 	var tags = [];
 	var names = [];
@@ -88,20 +82,20 @@ app.get('/', function(req, res)	{
 	var wins = [];
 	var losses = [];
 
-	playerArray.forEach(function(element) {
+	/*playerArray.forEach(function(element) {
 		tags.push(element.playertag);
 		//console.log("tags pushed: " + element.playertag);
 		names.push(element.playername);
 		elos.push(element.elo);
 		wins.push(element.wins);
 		wins.push(element.losses);
-	});
+	});*/
 	
-	res.render('akiElo', {
-		firstPlayerTag: tags[0], firstPlayerName: names[0], firstPlayerElo: elos[0], firstPlayerWins: wins[0], firstPlayerLosses: losses[0], 
-		secondPlayerTag: tags[1], secondPlayerName: names[1], secondPlayerElo: elos[1], secondPlayerWins: wins[1], secondPlayerLosses: losses[1],
-		thirdPlayerTag: tags[2], thirdPlayerName: names[2], thirdPlayerElo: elos[2], thirdPlayerWins: wins[2], thirdPlayerLosses: losses[2] 
-	})
+	res.render('akiElo', { playerlist: playerArray })//{
+	//	firstPlayerTag: tags[0], firstPlayerName: names[0], firstPlayerElo: elos[0], firstPlayerWins: wins[0], firstPlayerLosses: losses[0], 
+	//	secondPlayerTag: tags[1], secondPlayerName: names[1], secondPlayerElo: elos[1], secondPlayerWins: wins[1], secondPlayerLosses: losses[1],
+	//	thirdPlayerTag: tags[2], thirdPlayerName: names[2], thirdPlayerElo: elos[2], thirdPlayerWins: wins[2], thirdPlayerLosses: losses[2] 
+	//})
 	
 });
 

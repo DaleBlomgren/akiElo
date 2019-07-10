@@ -4,6 +4,6 @@ html(lang='en')
    title akiElo
  body
    h1 Third Strike Leaderboard Bitch
-   p First: #{firstPlayerTag} #{firstPlayerName} #{firstPlayerElo} #{firstPlayerWins} #{firstPlayerLosses}
-   p Second: #{secondPlayerTag} #{secondPlayerName} #{secondPlayerElo} #{secondPlayerWins} #{secondPlayerLosses}
-   p Third: #{thirdPlayerTag} #{thirdPlayerName} #{thirdPlayerElo} #{thirdPlayerWins} #{thirdPlayerLosses}
+   ul
+     each element, index in playerlist
+       li= (index + 1) + ' ' + element.playertag + ' ' + element.elo
