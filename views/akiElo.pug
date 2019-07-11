@@ -3,7 +3,17 @@ html(lang='en')
  head
    title akiElo
  body
-   h1 Third Strike Leaderboard Bitch
-   ul
-     each element, index in playerlist
-       li= (index + 1) + ' ' + element.playertag + ' ' + element.elo
+   h1 Third Strike Leaderboard
+   div 
+     table(style='width:100%', border='1')
+       thead
+         tr
+           th Standing
+           th Playertag
+           th AkiElo
+       tbody
+         each element, index in playerlist
+           tr
+             th #{(index + 1)} 
+             th #{element.playertag} 
+             th #{element.elo}

@@ -16,9 +16,7 @@ function Player(playertag, playername, elo, wins, losses){
 var playerArray = new Array();
 var listOfPlayers = new Array();
 
-
 var url = 'mongodb://localhost';
-
 
 app.set('view engine', 'pug');
 app.use(express.json());
@@ -26,7 +24,7 @@ app.use('/scripts', express.static(__dirname + '/scripts'));
 
 function updateLeaderboard(){
 	playerArray = new Array();
-	MongoClient.connect(url, function(err, client)	{
+	MongoClient.connect(url, { useNewUrlParser: true}, function(err, client)	{
 			if (err) throw err;
 			var db = client.db('SF3db');
 			var cursor = db.collection('playerbase').find();
@@ -104,19 +102,18 @@ app.post('/playerID', async function(req, res) {
 	res.json(req.body);
 	var matchJs = req.body;
 	var calculatedElo;
-	console.log(req.body.winningTag + " is the winner!");
-	console.log("matchJs: " + Object.values(matchJs));
+	//console.log(req.body.winningTag + " is the winner!");
+	//console.log("matchJs: " + Object.values(matchJs));
 
 
 	playerTagSearch(matchJs.winningTag, matchJs.losingTag).then(function(packet){
 		setTimeout(() => {
-	 	console.log("packet: " + Object.values(packet));
+	 	//console.log("packet: " + Object.values(packet));
 	 	calculatedElo = eloRating.calculate(packet.winningDocument.playerElo, packet.losingDocument.playerElo);
 	 
 
 		//console.log("calculatedElo: " + calculatedElo);
 		//setTimeout(() => {
-			console.log("in timeout after playerTagSearch chain");
 			MongoClient.connect(url, function(err, client)	{
 				if (err) throw err;
 				var db = client.db('SF3db');
@@ -163,13 +160,11 @@ app.route('/playerID/:id').get(function(req, res) {
 function playerTagSearch(winningPlayerTag, losingPlayerTag){
 var promise = new Promise(function(resolve, reject) {
 	var packet, tempWinner, tempLoser;
-	MongoClient.connect(url, async function(err, client)	{
+	MongoClient.connect(url, { useNewUrlParser: true}, async function(err, client)	{
 		if (err) throw err;
 		var db = client.db('SF3db');
 		if (db) console.log('Connected.');
 
-		console.log("in playerSearch()");
-		console.log("winningPlayerTag: " + winningPlayerTag + " losingPlayerTag: " + losingPlayerTag);
 		var wursorQuery = { playerTag: winningPlayerTag };
 		var wursor = db.collection('playerbase').find(wursorQuery);
 		var lursor = db.collection('playerbase').find({playerTag: losingPlayerTag});
@@ -180,16 +175,16 @@ var promise = new Promise(function(resolve, reject) {
 
 			wursor.forEach(function(doc){
 				if (doc != null){
-				console.log("wursordoc: " + doc);
-				tempWinner = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
+				//	console.log("wursordoc: " + doc);
+					tempWinner = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
 				}
 				else console.log("wursor doc failure");
 			})
 
 			lursor.forEach(function(doc){
 				if (doc != null) {
-				console.log("lursordoc: " + doc);
-				tempLoser = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
+				//	console.log("lursordoc: " + doc);
+					tempLoser = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
 				}
 			})
 
@@ -208,11 +203,7 @@ var promise = new Promise(function(resolve, reject) {
 		
 		
 
-	});//.then(packet => {
-	//	console.log("packet: " + packet);
-		//var packet = {winningDocument: wursor, losingDocument: losingPlayerTag};
-		//return packet; 
-	//});
+	});
 });
 	return promise;
 };
