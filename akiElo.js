@@ -55,8 +55,6 @@ function compare(a, b) {
 	return 0;
 }
 
-//playerArray.sort(compare);
-
 app.route('/matchhistory').get(function(req, res)	{
 
 });
@@ -79,41 +77,23 @@ app.get('/', function(req, res)	{
 	var elos = [];
 	var wins = [];
 	var losses = [];
-
-	/*playerArray.forEach(function(element) {
-		tags.push(element.playertag);
-		//console.log("tags pushed: " + element.playertag);
-		names.push(element.playername);
-		elos.push(element.elo);
-		wins.push(element.wins);
-		wins.push(element.losses);
-	});*/
 	
-	res.render('akiElo', { playerlist: playerArray })//{
-	//	firstPlayerTag: tags[0], firstPlayerName: names[0], firstPlayerElo: elos[0], firstPlayerWins: wins[0], firstPlayerLosses: losses[0], 
-	//	secondPlayerTag: tags[1], secondPlayerName: names[1], secondPlayerElo: elos[1], secondPlayerWins: wins[1], secondPlayerLosses: losses[1],
-	//	thirdPlayerTag: tags[2], thirdPlayerName: names[2], thirdPlayerElo: elos[2], thirdPlayerWins: wins[2], thirdPlayerLosses: losses[2] 
-	//})
+	res.render('akiElo', { playerlist: playerArray })
 	
 });
 
 app.post('/playerID', async function(req, res) {
-	//var reportObj = JSON.parse(req.body);
+	
 	res.json(req.body);
 	var matchJs = req.body;
 	var calculatedElo;
-	//console.log(req.body.winningTag + " is the winner!");
-	//console.log("matchJs: " + Object.values(matchJs));
-
 
 	playerTagSearch(matchJs.winningTag, matchJs.losingTag).then(function(packet){
 		setTimeout(() => {
-	 	//console.log("packet: " + Object.values(packet));
+	 	
 	 	calculatedElo = eloRating.calculate(packet.winningDocument.playerElo, packet.losingDocument.playerElo);
 	 
 
-		//console.log("calculatedElo: " + calculatedElo);
-		//setTimeout(() => {
 			MongoClient.connect(url, function(err, client)	{
 				if (err) throw err;
 				var db = client.db('SF3db');
