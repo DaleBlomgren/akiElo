@@ -20,9 +20,17 @@ function testDaJSON(){
 	var package = {winningTag: x.value, winningCharacter: xCharacter.value, losingTag: y.value, losingCharacter: yCharacter.value};
 	console.log(package);
 	var cPackage = JSON.stringify(package);
-	console.log("\n\ncPackage: " + cPackage);
+//	console.log("\n\ncPackage: " + cPackage);
 	xhr.open('POST', url, true);
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(cPackage);
-	alert("sent(supposedly)");
+
+	xhr.onreadystatechage = function() {
+		if(xhr.readyState == 4){
+			if (xhr.status == 200)
+				alert("Match Added");
+			else
+				alert(xhr.responseText);
+		}
+	}
 }
