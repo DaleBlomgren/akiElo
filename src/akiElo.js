@@ -24,7 +24,7 @@ app.use('/scripts', express.static(__dirname + '/scripts'));
 
 function updateLeaderboard(){
 	playerArray = new Array();
-	MongoClient.connect(url, { useNewUrlParser: true}, function(err, client)	{
+	MongoClient.connect(url, { useNewUrlParser: true}, function(err, client){
 			if (err) throw err;
 			var db = client.db('SF3db');
 			var cursor = db.collection('playerbase').find();
@@ -41,7 +41,7 @@ function updateLeaderboard(){
 	});
 }
 updateLeaderboard();
-setInterval(function(){ updateLeaderboard() }, 5000);
+setInterval(function(){ updateLeaderboard() }, 10000);
 
 //Sort playerArray
 
@@ -84,57 +84,102 @@ app.get('/', function(req, res)	{
 
 app.post('/playerID', async function(req, res) {
 	
-	res.json(req.body);
+	//res.json(req.body);
+	var count;
 	var matchJs = req.body;
 	var calculatedElo;
+	var matchArray;
+	var matchCount = 0;
+	var rejection = false;
+
+	var today = new Date();
+	var dd = String(today.getDate()).padStart(2, '0');
+	var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+	var yyyy = today.getFullYear();
+
+	today = mm + '/' + dd + '/' + yyyy;
+	
 
 	playerTagSearch(matchJs.winningTag, matchJs.losingTag).then(function(packet){
 		setTimeout(() => {
-	 	
+	 	//need to check if match has been played today and send a proper response code
 	 	calculatedElo = eloRating.calculate(packet.winningDocument.playerElo, packet.losingDocument.playerElo);
 	 
 
-			MongoClient.connect(url, function(err, client)	{
-				if (err) throw err;
-				var db = client.db('SF3db');
-				if (db) console.log('Connected.');
+		MongoClient.connect(url, { useNewUrlParser: true}, function(err, client){
+			if (err) throw err;
+			var db = client.db('SF3db');
+			//if (db) console.log('Connected.');
 
-				db.collection('playerbase').update(
+			//check if player has been selected twice
+
+			//check if match has been played today and send a proper response code
+			var historyCursor = db.collection('matchhistory').find();
+
+			count = 0;
+			historyCursor.forEach(function(element){
+				if (element.winner == matchJs.winningTag && element.loser == matchJs.losingTag && today == element.date){
+					count++;
+					if (count > 2){
+						rejection = true;
+						console.log('Rejected, match limit reached');
+					}	
+				}
+			});
+
+			if (rejection == false) {
+				db.collection('playerbase').updateOne(
 					{ playerTag: matchJs.winningTag},
 					{ $set:
 						{
-							playerElo: calculatedElo.playerRating,
-							playerWins: ++packet.winningDocument.playerWins
+						playerElo: calculatedElo.playerRating,
+						playerWins: ++packet.winningDocument.playerWins
 						}
-					}
+					},
+					function(err, res) { if (err) throw err; }
 				)
 
-				db.collection('playerbase').update(
+				db.collection('playerbase').updateOne(
 					{ playerTag: matchJs.losingTag},
 					{ $set: 
 						{
-							playerElo: calculatedElo.opponentRating,
-							playerLosses: ++packet.losingDocument.playerLosses
+						playerElo: calculatedElo.opponentRating,
+						playerLosses: ++packet.losingDocument.playerLosses
 						}
-					} 
+					},
+					function(err, res) { if (err) throw err; } 
 				)
-				client.close();
-			});	
-	
-			console.log("Updated.");
 
-		//client.close();
+				var matchDocument = {
+					winner: matchJs.winningTag,
+					loser: matchJs.losingTag,
+					winningcharacter: matchJs.winningCharacter,
+					losingcharacter: matchJs.losingCharacter,
+					date: today
+				};
+
+				db.collection('matchhistory').insertOne(matchDocument, function(err, res){
+					if (err) throw err;
+					console.log("Match Updated");
+				});
+
+				client.close();
+				res.send('200')
+			}
+			else{
+				res.send('Error: Match not added')
+				client.close();
+			}
+		});	
 
 		}, 1000);
 
-});
-	//res.send(200);
+	});
+	
 });
 
 app.route('/playerID/:id').get(function(req, res) {
-	console.log(req.body);
 	res.render('playerID', {output:req.params.id})
-
 });
 
 function playerTagSearch(winningPlayerTag, losingPlayerTag){
@@ -143,45 +188,35 @@ var promise = new Promise(function(resolve, reject) {
 	MongoClient.connect(url, { useNewUrlParser: true}, async function(err, client)	{
 		if (err) throw err;
 		var db = client.db('SF3db');
-		if (db) console.log('Connected.');
 
 		var wursorQuery = { playerTag: winningPlayerTag };
 		var wursor = db.collection('playerbase').find(wursorQuery);
 		var lursor = db.collection('playerbase').find({playerTag: losingPlayerTag});
 
-		
-		//	console.log("wursor: " + JSON.stringify(wursor, null, 4));
-		//	console.log("lursor: " + JSON.stringify(lursor, null, 4));
 
-			wursor.forEach(function(doc){
-				if (doc != null){
-				//	console.log("wursordoc: " + doc);
-					tempWinner = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
-				}
-				else console.log("wursor doc failure");
-			})
+		wursor.forEach(function(doc){
+			if (doc != null){
+				tempWinner = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
+			}
+			else console.log("wursor doc failure");
+		})
 
-			lursor.forEach(function(doc){
-				if (doc != null) {
-				//	console.log("lursordoc: " + doc);
-					tempLoser = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
-				}
-			})
+		lursor.forEach(function(doc){
+			if (doc != null) {
+				tempLoser = {playerTag: doc.playerTag, playerName: doc.playerName, playerElo: doc.playerElo, playerWins: doc.playerWins, playerLosses: doc.playerLosses};
+			}
+			else console.log("lursor doc failure");
+		})
 
-
-			//console.log("packet: " + packet);
-		
-			client.close();
-			setTimeout(() => {
-			console.log("tempWinner: " + Object.values(tempWinner) + ", tempLoser: " + Object.values(tempLoser));
+		client.close();
+		setTimeout(() => {
+			//console.log("tempWinner: " + Object.values(tempWinner) + ", tempLoser: " + Object.values(tempLoser));
 		
 			packet = {winningDocument: tempWinner, losingDocument: tempLoser};
 
 			resolve(packet);
 	
-			}, 200);
-		
-		
+		}, 200);
 
 	});
 });

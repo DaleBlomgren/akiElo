@@ -12,6 +12,7 @@ function reportScores(){
 
 function testDaJSON(){
 	var xhr = new XMLHttpRequest();
+	var request = new XMLHttpRequest();
 
 	var x = document.getElementById('winningPlayerTag');
 	var xCharacter = document.getElementById('winningPlayerCharacter');
@@ -20,17 +21,32 @@ function testDaJSON(){
 	var package = {winningTag: x.value, winningCharacter: xCharacter.value, losingTag: y.value, losingCharacter: yCharacter.value};
 	console.log(package);
 	var cPackage = JSON.stringify(package);
-//	console.log("\n\ncPackage: " + cPackage);
+
+	xhr.onreadystatechange = function() {
+		console.log("State change: " + xhr.readyState);
+		if(xhr.readyState == 4){
+				console.log(xhr.responseText);
+		}
+	};
+
 	xhr.open('POST', url, true);
 	xhr.setRequestHeader("Content-Type", "application/json");
+	//xhr.setResponseHeader("Content-Type", "text/html");
+	xhr.responseType = 'text';
+	
+
 	xhr.send(cPackage);
 
-	xhr.onreadystatechage = function() {
-		if(xhr.readyState == 4){
-			if (xhr.status == 200)
-				alert("Match Added");
-			else
-				alert(xhr.responseText);
-		}
+	
+	/*
+	request.responseType = 'text';
+	request.open('GET', 'http://localhost:6969');
+	request.onload = function() {
+		console.log(request.response);
+		console.log(request.response.byteLength);
 	}
+	request.send();
+	*/
+	
+
 }
