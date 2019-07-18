@@ -1,4 +1,4 @@
-var url = "http://localhost:6969/playerID";
+var url = "http://akielo.ddns.net/playerID";
 
 function printNames(){
 	var x = document.getElementById('winningPlayerTag');
@@ -26,6 +26,7 @@ function testDaJSON(){
 		console.log("State change: " + xhr.readyState);
 		if(xhr.readyState == 4){
 				console.log(xhr.responseText);
+				alert(xhr.responseText);
 		}
 	};
 

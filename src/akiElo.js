@@ -164,7 +164,7 @@ app.post('/playerID', async function(req, res) {
 				});
 
 				client.close();
-				res.send('200')
+				res.send("Match entry confirmed.")
 			}
 			else{
 				res.send('Error: Match not added')
@@ -223,5 +223,5 @@ var promise = new Promise(function(resolve, reject) {
 	return promise;
 };
 
-var server = app.listen(6969, function() {});
+var server = app.listen(80, function() {});
 
