@@ -116,8 +116,8 @@ app.post('/playerID', async function(req, res) {
 			//check if match has been played today and send a proper response code
 			var historyCursor = db.collection('matchhistory').find();
 
-			count = 0;
-			historyCursor.forEach(function(element){
+		//	count = 0;
+		/*	historyCursor.forEach(function(element){
 				if (element.winner == matchJs.winningTag && element.loser == matchJs.losingTag && today == element.date){
 					count++;
 					if (count > 2){
@@ -126,7 +126,7 @@ app.post('/playerID', async function(req, res) {
 					}	
 				}
 			});
-
+		*/
 			if (rejection == false) {
 				db.collection('playerbase').updateOne(
 					{ playerTag: matchJs.winningTag},
