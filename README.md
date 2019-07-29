@@ -6,6 +6,6 @@ This is a website that connects to a database that holds player data.  This then
 Most should be included in the git project, but you will need to run a mongo database somewhere to hold your data.  Change your URL and port as needed.    
 
 Load the code up in the /src folder with
-'''
-node akiElo.js
-'''
+
+`node akiElo.js`
+
