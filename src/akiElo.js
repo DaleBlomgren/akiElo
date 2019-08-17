@@ -4,6 +4,8 @@ var pug = require('pug');
 var eloRating = require('elo-rating');
 var app = express();
 
+
+
 function Player(playertag, playername, elo, wins, losses){
 	this.playertag = playertag;
 	this.playername = playername;
@@ -12,7 +14,54 @@ function Player(playertag, playername, elo, wins, losses){
 	this.losses = losses;
 	//add match and game wins and losses
 };
+/*
+const useStyles = makeStyles({
+	root: {
+		width: '100%',
+		marginTop: ThemeProvider.spacing(3),
+		overflowX: 'auto',
+		padding: ThemeProvider.spacing(3, 2), 
+	},
+	table: {
+		minWidth: 650,
+	},
+});
 
+export default function Leaderboard() {
+	const classes = useStyles();
+	playerArray.sort(compare);
+	return(
+		<div>
+			<Paper className={classes.root}>
+				<Table className={classes.table}>
+					<TableHead>
+						<TableRow>
+							<TableCell>Player Tag</TableCell>
+							<TableCell align="right">Player Name</TableCell>
+							<TableCell align="right">Player Elo</TableCell>
+							<TableCell align="right">Wins</TableCell>
+							<TableCell align="right">Losses</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{playerArray.map(player => (
+							<TableRow key={player.playertag}>
+								<TableCell component="th" scope="row">
+									{player.playerTag}
+								</TableCell>
+								<TableCell align="right">{player.playername}</TableCell>
+								<TableCell align="right">{player.playerelo}</TableCell>
+								<TableCell align="right">{player.wins}</TableCell>
+								<TableCell align="right">{player.losses}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</Paper>
+		</div>
+	)
+}
+*/
 var playerArray = new Array();
 var listOfPlayers = new Array();
 
@@ -43,13 +92,25 @@ function updateLeaderboard(){
 updateLeaderboard();
 setInterval(function(){ updateLeaderboard() }, 10000);
 
+
 //Sort playerArray
 
-function compare(a, b) {
+function compareElo(a, b) {
 	
 	if (a.elo < b.elo){
 		return 1;
 	} else if (a.elo > b.elo){
+		return -1;
+	}
+	return 0;
+}
+
+function compareName(a, b) {
+
+	if (a.playertag < b.playertag){
+		return 1;
+	}
+	else if (a.playertag > b.playertag){
 		return -1;
 	}
 	return 0;
@@ -64,20 +125,16 @@ app.route('/report').get(function(req, res)	{
 	playerArray.forEach(function(element){
 		listOfPlayers.push(element.playertag);
 	});
-
+	listOfPlayers.sort();
 	//console.log(listOfPlayers);
 	res.render('akiReport', { playerlist: listOfPlayers})  
 });
 
 app.get('/', function(req, res)	{
-	playerArray.sort(compare);
+	playerArray.sort(compareElo);
 	
-	var tags = [];
-	var names = [];
-	var elos = [];
-	var wins = [];
-	var losses = [];
-	
+
+
 	res.render('akiElo', { playerlist: playerArray })
 	
 });
@@ -223,5 +280,5 @@ var promise = new Promise(function(resolve, reject) {
 	return promise;
 };
 
-var server = app.listen(80, function() {});
+var server = app.listen(9998, function() {});
 
